@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Saved from './pages/Saved';
+import NotFound from './pages/NotFound';
 import { API_URL } from './config';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register setUser={setUser} />} />
         <Route path="/saved" element={<Saved user={user} />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

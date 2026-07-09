@@ -14,23 +14,36 @@ function Navbar({ user, setUser }) {
   }
 
   return (
-    <nav className="navbar navbar-expand navbar-dark bg-dark px-3">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
       <Link className="navbar-brand" to="/">Personal News Dashboard</Link>
-      <div className="navbar-nav ms-auto">
-        {user ? (
-          <>
-            <Link className="nav-link text-white" to="/saved">Saved Articles</Link>
-            <span className="navbar-text text-white me-3">Hi, {user.username}</span>
-            <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link className="nav-link text-white" to="/login">Login</Link>
-            <Link className="nav-link text-white" to="/register">Register</Link>
-          </>
-        )}
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span className="navbar-toggler-icon"></span>
+      </button>
+      <div className="collapse navbar-collapse" id="navbarNav">
+        <div className="navbar-nav ms-auto align-items-lg-center">
+          {user ? (
+            <>
+              <Link className="nav-link text-white" to="/saved">Saved Articles</Link>
+              <span className="navbar-text text-white me-lg-3">Hi, {user.username}</span>
+              <button className="btn btn-outline-light btn-sm my-2 my-lg-0" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="nav-link text-white" to="/login">Login</Link>
+              <Link className="nav-link text-white" to="/register">Register</Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
