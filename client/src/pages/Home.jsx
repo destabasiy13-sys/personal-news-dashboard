@@ -1,28 +1,52 @@
 import { useState, useEffect } from 'react';
 import { API_URL } from '../config';
 
+const SOURCES = [
+  'BBC News',
+  'Al Jazeera English',
+  'Associated Press',
+  'Independent',
+  'The Times of India',
+];
+
 function Home() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState('');
 
   useEffect(() => {
-    fetch(`${API_URL}/api/news`)
+    setLoading(true);
+    const url = source
+      ? `${API_URL}/api/news?source=${encodeURIComponent(source)}`
+      : `${API_URL}/api/news`;
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setArticles(data);
         setLoading(false);
       });
-  }, []);
-
-  if (loading) {
-    return <div className="container mt-4">Loading news...</div>;
-  }
+  }, [source]);
 
   return (
     <div className="container mt-4">
-      <h1>Latest News</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1>Latest News</h1>
+        <select
+          className="form-select"
+          style={{ width: 'auto' }}
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+        >
+          <option value="">All Sources</option>
+          {SOURCES.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      </div>
 
-      {articles.length === 0 && <p>No articles available yet.</p>}
+      {loading && <p>Loading news...</p>}
+      {!loading && articles.length === 0 && <p>No articles available yet.</p>}
 
       <div className="row">
         {articles.map((article) => (
