@@ -15,6 +15,8 @@ function Home({ user }) {
   const [source, setSource] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [savedIds, setSavedIds] = useState(new Set());
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMessage, setRefreshMessage] = useState('');
@@ -25,22 +27,30 @@ function Home({ user }) {
     const params = new URLSearchParams();
     if (source) params.set('source', source);
     if (search) params.set('q', search);
+    params.set('page', page);
 
     return fetch(`${API_URL}/api/news?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
-        setArticles(data);
+        setArticles(data.articles);
+        setTotalPages(data.totalPages);
         setLoading(false);
       });
   }
 
   useEffect(() => {
     loadArticles();
-  }, [source, search]);
+  }, [source, search, page]);
+
+  function handleSourceChange(e) {
+    setSource(e.target.value);
+    setPage(1);
+  }
 
   function handleSearchSubmit(e) {
     e.preventDefault();
     setSearch(searchInput.trim());
+    setPage(1);
   }
 
   async function handleRefresh() {
@@ -112,7 +122,7 @@ function Home({ user }) {
             className="form-select"
             style={{ width: 'auto' }}
             value={source}
-            onChange={(e) => setSource(e.target.value)}
+            onChange={handleSourceChange}
           >
             <option value="">All Sources</option>
             {SOURCES.map((s) => (
@@ -177,6 +187,26 @@ function Home({ user }) {
           </div>
         ))}
       </div>
+
+      {!loading && totalPages > 1 && (
+        <div className="d-flex justify-content-center align-items-center gap-3 mb-4">
+          <button
+            className="btn btn-outline-primary"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            className="btn btn-outline-primary"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

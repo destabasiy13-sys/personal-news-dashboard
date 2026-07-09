@@ -16,8 +16,7 @@ async function insertArticle(article) {
   return result.affectedRows > 0;
 }
 
-async function getArticles(sourceName, searchQuery) {
-  let query = 'SELECT id, title, description, url, source_name, image_url, published_at FROM articles';
+async function getArticles(sourceName, searchQuery, page = 1, limit = 12) {
   const conditions = [];
   const params = [];
 
@@ -32,14 +31,28 @@ async function getArticles(sourceName, searchQuery) {
     params.push(likeValue, likeValue);
   }
 
-  if (conditions.length > 0) {
-    query += ' WHERE ' + conditions.join(' AND ');
-  }
+  const whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
-  query += ' ORDER BY published_at DESC LIMIT 50';
+  const [countRows] = await pool.query(
+    `SELECT COUNT(*) AS total FROM articles ${whereClause}`,
+    params
+  );
+  const totalCount = countRows[0].total;
 
-  const [rows] = await pool.query(query, params);
-  return rows;
+  const offset = (page - 1) * limit;
+  const [rows] = await pool.query(
+    `SELECT id, title, description, url, source_name, image_url, published_at
+     FROM articles ${whereClause}
+     ORDER BY published_at DESC
+     LIMIT ? OFFSET ?`,
+    [...params, limit, offset]
+  );
+
+  return {
+    articles: rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+  };
 }
 
 module.exports = { insertArticle, getArticles };

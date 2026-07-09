@@ -11,9 +11,10 @@ const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 let lastRefreshAttempt = 0;
 
 async function getNews(req, res) {
-  const { source, q } = req.query;
-  const articles = await articleModel.getArticles(source, q);
-  res.json(articles);
+  const { source, q, page } = req.query;
+  const pageNum = parseInt(page, 10) || 1;
+  const result = await articleModel.getArticles(source, q, pageNum);
+  res.json(result);
 }
 
 async function refreshNews(req, res) {
