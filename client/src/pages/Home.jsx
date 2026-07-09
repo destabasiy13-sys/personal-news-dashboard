@@ -16,24 +16,49 @@ function Home({ user }) {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [savedIds, setSavedIds] = useState(new Set());
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMessage, setRefreshMessage] = useState('');
+  const [refreshMessageType, setRefreshMessageType] = useState('info');
 
-  useEffect(() => {
+  function loadArticles() {
     setLoading(true);
     const params = new URLSearchParams();
     if (source) params.set('source', source);
     if (search) params.set('q', search);
 
-    fetch(`${API_URL}/api/news?${params.toString()}`)
+    return fetch(`${API_URL}/api/news?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setArticles(data);
         setLoading(false);
       });
+  }
+
+  useEffect(() => {
+    loadArticles();
   }, [source, search]);
 
   function handleSearchSubmit(e) {
     e.preventDefault();
     setSearch(searchInput.trim());
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setRefreshMessage('');
+
+    const res = await fetch(`${API_URL}/api/news/refresh`, { method: 'POST' });
+    const data = await res.json();
+
+    if (!res.ok) {
+      setRefreshMessageType('warning');
+      setRefreshMessage(data.error);
+    } else {
+      setRefreshMessageType('success');
+      setRefreshMessage(`Refreshed — ${data.saved} new article(s) found.`);
+      await loadArticles();
+    }
+    setRefreshing(false);
   }
 
   useEffect(() => {
@@ -94,8 +119,19 @@ function Home({ user }) {
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+          <button
+            className="btn btn-outline-success"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? 'Refreshing...' : 'Refresh Now'}
+          </button>
         </div>
       </div>
+
+      {refreshMessage && (
+        <div className={`alert alert-${refreshMessageType} py-2`}>{refreshMessage}</div>
+      )}
 
       {loading && <p>Loading news...</p>}
       {!loading && articles.length === 0 && <p>No articles available yet.</p>}

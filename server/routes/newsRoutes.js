@@ -3,5 +3,6 @@ const router = express.Router();
 const newsController = require('../controllers/newsController');
 
 router.get('/', newsController.getNews);
+router.post('/refresh', newsController.refreshNews);
 
 module.exports = router;

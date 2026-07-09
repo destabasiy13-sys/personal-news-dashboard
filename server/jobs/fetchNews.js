@@ -13,7 +13,7 @@ async function fetchAndCacheNews() {
 
   if (data.status !== 'ok') {
     console.error('NewsAPI error:', data.message);
-    return;
+    return { received: 0, saved: 0, error: data.message };
   }
 
   let savedCount = 0;
@@ -33,6 +33,7 @@ async function fetchAndCacheNews() {
   }
 
   console.log(`News fetch complete: ${data.articles.length} received, ${savedCount} new articles saved.`);
+  return { received: data.articles.length, saved: savedCount };
 }
 
 module.exports = fetchAndCacheNews;
