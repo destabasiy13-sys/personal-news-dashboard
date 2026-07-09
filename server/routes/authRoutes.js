@@ -8,5 +8,7 @@ router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 router.get('/me', requireAuth, authController.getCurrentUser);
 router.put('/me', requireAuth, authController.updateProfile);
+router.get('/verify-email', authController.verifyEmail);
+router.post('/resend-verification', requireAuth, authController.resendVerification);
 
 module.exports = router;

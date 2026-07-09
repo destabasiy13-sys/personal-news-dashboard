@@ -8,6 +8,7 @@ const newsRoutes = require('./routes/newsRoutes');
 const savedRoutes = require('./routes/savedRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const fetchAndCacheNews = require('./jobs/fetchNews');
+const { initMailer } = require('./config/mailer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,9 +29,11 @@ app.use('/api/news', newsRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/stats', statsRoutes);
 
-fetchAndCacheNews();
-cron.schedule('*/30 * * * *', fetchAndCacheNews);
+initMailer().then(() => {
+  fetchAndCacheNews();
+  cron.schedule('*/30 * * * *', fetchAndCacheNews);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 });

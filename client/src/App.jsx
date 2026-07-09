@@ -7,7 +7,9 @@ import Register from './pages/Register';
 import Saved from './pages/Saved';
 import Settings from './pages/Settings';
 import Stats from './pages/Stats';
+import VerifyEmail from './pages/VerifyEmail';
 import NotFound from './pages/NotFound';
+import VerifyBanner from './components/VerifyBanner';
 import { API_URL } from './config';
 
 function App() {
@@ -32,6 +34,7 @@ function App() {
   return (
     <>
       <Navbar user={user} setUser={setUser} theme={theme} toggleTheme={toggleTheme} />
+      <VerifyBanner user={user} />
       <Routes>
         <Route path="/" element={<Home user={user} />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
@@ -39,6 +42,7 @@ function App() {
         <Route path="/saved" element={<Saved user={user} />} />
         <Route path="/settings" element={<Settings user={user} setUser={setUser} />} />
         <Route path="/stats" element={<Stats />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

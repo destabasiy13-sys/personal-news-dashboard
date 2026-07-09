@@ -1,5 +1,16 @@
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const userModel = require('../models/userModel');
+const { sendVerificationEmail } = require('../config/mailer');
+
+const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+async function issueVerificationToken(userId, email) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
+  await userModel.setVerificationToken(userId, token, expiresAt);
+  await sendVerificationEmail(email, token);
+}
 
 async function register(req, res) {
   const { username, email, password } = req.body;
@@ -18,9 +29,10 @@ async function register(req, res) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const userId = await userModel.createUser(username, email, passwordHash);
+  await issueVerificationToken(userId, email);
 
   req.session.userId = userId;
-  res.status(201).json({ id: userId, username, email });
+  res.status(201).json({ id: userId, username, email, is_verified: false });
 }
 
 async function login(req, res) {
@@ -41,7 +53,12 @@ async function login(req, res) {
   }
 
   req.session.userId = user.id;
-  res.json({ id: user.id, username: user.username, email: user.email });
+  res.json({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    is_verified: !!user.is_verified,
+  });
 }
 
 function logout(req, res) {
@@ -94,4 +111,43 @@ async function updateProfile(req, res) {
   res.json({ id: userId, username, email });
 }
 
-module.exports = { register, login, logout, getCurrentUser, updateProfile };
+async function verifyEmail(req, res) {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({ error: 'Verification token is required.' });
+  }
+
+  const user = await userModel.findByVerificationToken(token);
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid or already-used verification link.' });
+  }
+
+  if (new Date(user.verification_token_expires) < new Date()) {
+    return res.status(400).json({ error: 'This verification link has expired.' });
+  }
+
+  await userModel.markVerified(user.id);
+  res.json({ message: 'Email verified successfully.' });
+}
+
+async function resendVerification(req, res) {
+  const user = await userModel.findById(req.session.userId);
+
+  if (user.is_verified) {
+    return res.status(400).json({ error: 'Your email is already verified.' });
+  }
+
+  await issueVerificationToken(user.id, user.email);
+  res.json({ message: 'Verification email sent.' });
+}
+
+module.exports = {
+  register,
+  login,
+  logout,
+  getCurrentUser,
+  updateProfile,
+  verifyEmail,
+  resendVerification,
+};
