@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
-function Navbar({ user, setUser }) {
+function Navbar({ user, setUser, theme, toggleTheme }) {
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -29,6 +29,12 @@ function Navbar({ user, setUser }) {
       </button>
       <div className="collapse navbar-collapse" id="navbarNav">
         <div className="navbar-nav ms-auto align-items-lg-center">
+          <button
+            className="btn btn-outline-light btn-sm my-2 my-lg-0 me-lg-2"
+            onClick={toggleTheme}
+          >
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </button>
           <Link className="nav-link text-white" to="/stats">Stats</Link>
           {user ? (
             <>

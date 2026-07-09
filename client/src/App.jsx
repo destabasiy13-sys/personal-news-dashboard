@@ -12,6 +12,7 @@ import { API_URL } from './config';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
     fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
@@ -19,9 +20,18 @@ function App() {
       .then((data) => setUser(data));
   }, []);
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((t) => (t === 'light' ? 'dark' : 'light'));
+  }
+
   return (
     <>
-      <Navbar user={user} setUser={setUser} />
+      <Navbar user={user} setUser={setUser} theme={theme} toggleTheme={toggleTheme} />
       <Routes>
         <Route path="/" element={<Home user={user} />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
