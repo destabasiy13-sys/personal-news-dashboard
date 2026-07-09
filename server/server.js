@@ -4,6 +4,7 @@ const cors = require('cors');
 const cron = require('node-cron');
 const sessionMiddleware = require('./config/session');
 const authRoutes = require('./routes/authRoutes');
+const newsRoutes = require('./routes/newsRoutes');
 const fetchAndCacheNews = require('./jobs/fetchNews');
 
 const app = express();
@@ -21,6 +22,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/news', newsRoutes);
 
 fetchAndCacheNews();
 cron.schedule('*/30 * * * *', fetchAndCacheNews);
