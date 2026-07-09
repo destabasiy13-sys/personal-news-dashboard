@@ -59,4 +59,39 @@ async function getCurrentUser(req, res) {
   res.json(user);
 }
 
-module.exports = { register, login, logout, getCurrentUser };
+async function updateProfile(req, res) {
+  const userId = req.session.userId;
+  const { username, email, currentPassword, newPassword } = req.body;
+
+  if (!username || !email) {
+    return res.status(400).json({ error: 'Username and email are required.' });
+  }
+
+  const existing = await userModel.findByUsernameOrEmail(username, email);
+  if (existing && existing.id !== userId) {
+    return res.status(409).json({ error: 'Username or email is already taken.' });
+  }
+
+  if (newPassword) {
+    if (!currentPassword) {
+      return res.status(400).json({ error: 'Current password is required to set a new password.' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+    }
+
+    const passwordHash = await userModel.findPasswordHashById(userId);
+    const passwordMatches = await bcrypt.compare(currentPassword, passwordHash);
+    if (!passwordMatches) {
+      return res.status(401).json({ error: 'Current password is incorrect.' });
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    await userModel.updatePassword(userId, newPasswordHash);
+  }
+
+  await userModel.updateProfile(userId, username, email);
+  res.json({ id: userId, username, email });
+}
+
+module.exports = { register, login, logout, getCurrentUser, updateProfile };

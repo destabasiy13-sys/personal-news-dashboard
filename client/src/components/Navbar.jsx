@@ -32,6 +32,7 @@ function Navbar({ user, setUser }) {
           {user ? (
             <>
               <Link className="nav-link text-white" to="/saved">Saved Articles</Link>
+              <Link className="nav-link text-white" to="/settings">Settings</Link>
               <span className="navbar-text text-white me-lg-3">Hi, {user.username}</span>
               <button className="btn btn-outline-light btn-sm my-2 my-lg-0" onClick={handleLogout}>
                 Logout
