@@ -29,6 +29,7 @@ function Navbar({ user, setUser }) {
       </button>
       <div className="collapse navbar-collapse" id="navbarNav">
         <div className="navbar-nav ms-auto align-items-lg-center">
+          <Link className="nav-link text-white" to="/stats">Stats</Link>
           {user ? (
             <>
               <Link className="nav-link text-white" to="/saved">Saved Articles</Link>

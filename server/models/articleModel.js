@@ -55,4 +55,11 @@ async function getArticles(sourceName, searchQuery, page = 1, limit = 12) {
   };
 }
 
-module.exports = { insertArticle, getArticles };
+async function getSourceCounts() {
+  const [rows] = await pool.query(
+    'SELECT source_name, COUNT(*) AS count FROM articles GROUP BY source_name ORDER BY count DESC'
+  );
+  return rows;
+}
+
+module.exports = { insertArticle, getArticles, getSourceCounts };

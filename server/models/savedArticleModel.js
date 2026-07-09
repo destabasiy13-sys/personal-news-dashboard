@@ -35,4 +35,23 @@ async function getSavedArticles(userId) {
   return rows;
 }
 
-module.exports = { saveArticle, unsaveArticle, getSavedArticleIds, getSavedArticles };
+async function getMostSaved(limit = 5) {
+  const [rows] = await pool.query(
+    `SELECT a.id, a.title, a.source_name, COUNT(sa.id) AS save_count
+     FROM saved_articles sa
+     JOIN articles a ON sa.article_id = a.id
+     GROUP BY a.id, a.title, a.source_name
+     ORDER BY save_count DESC
+     LIMIT ?`,
+    [limit]
+  );
+  return rows;
+}
+
+module.exports = {
+  saveArticle,
+  unsaveArticle,
+  getSavedArticleIds,
+  getSavedArticles,
+  getMostSaved,
+};

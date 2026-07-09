@@ -6,6 +6,7 @@ const sessionMiddleware = require('./config/session');
 const authRoutes = require('./routes/authRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const savedRoutes = require('./routes/savedRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 const fetchAndCacheNews = require('./jobs/fetchNews');
 
 const app = express();
@@ -25,6 +26,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/stats', statsRoutes);
 
 fetchAndCacheNews();
 cron.schedule('*/30 * * * *', fetchAndCacheNews);
