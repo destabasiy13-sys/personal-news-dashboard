@@ -9,10 +9,11 @@ const SOURCES = [
   'The Times of India',
 ];
 
-function Home() {
+function Home({ user }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState('');
+  const [savedIds, setSavedIds] = useState(new Set());
 
   useEffect(() => {
     setLoading(true);
@@ -27,6 +28,36 @@ function Home() {
         setLoading(false);
       });
   }, [source]);
+
+  useEffect(() => {
+    if (!user) {
+      setSavedIds(new Set());
+      return;
+    }
+    fetch(`${API_URL}/api/saved/ids`, { credentials: 'include' })
+      .then((res) => res.json())
+      .then((ids) => setSavedIds(new Set(ids)));
+  }, [user]);
+
+  async function toggleSave(articleId) {
+    if (savedIds.has(articleId)) {
+      await fetch(`${API_URL}/api/saved/${articleId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      setSavedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(articleId);
+        return next;
+      });
+    } else {
+      await fetch(`${API_URL}/api/saved/${articleId}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setSavedIds((prev) => new Set(prev).add(articleId));
+    }
+  }
 
   return (
     <div className="container mt-4">
@@ -73,6 +104,16 @@ function Home() {
                   >
                     Read more
                   </a>
+                  {user && (
+                    <button
+                      className={`btn btn-sm mt-2 d-block ${
+                        savedIds.has(article.id) ? 'btn-warning' : 'btn-outline-secondary'
+                      }`}
+                      onClick={() => toggleSave(article.id)}
+                    >
+                      {savedIds.has(article.id) ? 'Saved' : 'Save'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
