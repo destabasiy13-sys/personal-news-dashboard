@@ -19,6 +19,7 @@ function Navbar({ user, setUser }) {
       <div className="navbar-nav ms-auto">
         {user ? (
           <>
+            <Link className="nav-link text-white" to="/saved">Saved Articles</Link>
             <span className="navbar-text text-white me-3">Hi, {user.username}</span>
             <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
               Logout

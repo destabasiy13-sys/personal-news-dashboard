@@ -23,4 +23,16 @@ async function getSavedArticleIds(userId) {
   return rows.map((row) => row.article_id);
 }
 
-module.exports = { saveArticle, unsaveArticle, getSavedArticleIds };
+async function getSavedArticles(userId) {
+  const [rows] = await pool.query(
+    `SELECT a.id, a.title, a.description, a.url, a.source_name, a.image_url, a.published_at
+     FROM saved_articles sa
+     JOIN articles a ON sa.article_id = a.id
+     WHERE sa.user_id = ?
+     ORDER BY sa.saved_at DESC`,
+    [userId]
+  );
+  return rows;
+}
+
+module.exports = { saveArticle, unsaveArticle, getSavedArticleIds, getSavedArticles };

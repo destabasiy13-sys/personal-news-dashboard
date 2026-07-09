@@ -17,4 +17,9 @@ async function getSavedIds(req, res) {
   res.json(ids);
 }
 
-module.exports = { saveArticle, unsaveArticle, getSavedIds };
+async function getSavedArticles(req, res) {
+  const articles = await savedArticleModel.getSavedArticles(req.session.userId);
+  res.json(articles);
+}
+
+module.exports = { saveArticle, unsaveArticle, getSavedIds, getSavedArticles };
