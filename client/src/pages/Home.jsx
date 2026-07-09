@@ -105,7 +105,7 @@ function Home({ user }) {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h1>Latest News</h1>
-        <div className="d-flex gap-2">
+        <div className="d-flex flex-wrap gap-2">
           <form className="d-flex" onSubmit={handleSearchSubmit}>
             <input
               type="text"
@@ -113,6 +113,7 @@ function Home({ user }) {
               placeholder="Search articles..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              style={{ minWidth: '140px' }}
             />
             <button type="submit" className="btn btn-outline-primary ms-2">
               Search
