@@ -13,21 +13,28 @@ function Home({ user }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [savedIds, setSavedIds] = useState(new Set());
 
   useEffect(() => {
     setLoading(true);
-    const url = source
-      ? `${API_URL}/api/news?source=${encodeURIComponent(source)}`
-      : `${API_URL}/api/news`;
+    const params = new URLSearchParams();
+    if (source) params.set('source', source);
+    if (search) params.set('q', search);
 
-    fetch(url)
+    fetch(`${API_URL}/api/news?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setArticles(data);
         setLoading(false);
       });
-  }, [source]);
+  }, [source, search]);
+
+  function handleSearchSubmit(e) {
+    e.preventDefault();
+    setSearch(searchInput.trim());
+  }
 
   useEffect(() => {
     if (!user) {
@@ -61,19 +68,33 @@ function Home({ user }) {
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h1>Latest News</h1>
-        <select
-          className="form-select"
-          style={{ width: 'auto' }}
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-        >
-          <option value="">All Sources</option>
-          {SOURCES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+        <div className="d-flex gap-2">
+          <form className="d-flex" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search articles..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <button type="submit" className="btn btn-outline-primary ms-2">
+              Search
+            </button>
+          </form>
+          <select
+            className="form-select"
+            style={{ width: 'auto' }}
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+          >
+            <option value="">All Sources</option>
+            {SOURCES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading && <p>Loading news...</p>}

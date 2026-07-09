@@ -1,8 +1,8 @@
 const articleModel = require('../models/articleModel');
 
 async function getNews(req, res) {
-  const { source } = req.query;
-  const articles = await articleModel.getArticles(source);
+  const { source, q } = req.query;
+  const articles = await articleModel.getArticles(source, q);
   res.json(articles);
 }
 

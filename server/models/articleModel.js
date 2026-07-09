@@ -16,13 +16,24 @@ async function insertArticle(article) {
   return result.affectedRows > 0;
 }
 
-async function getArticles(sourceName) {
+async function getArticles(sourceName, searchQuery) {
   let query = 'SELECT id, title, description, url, source_name, image_url, published_at FROM articles';
+  const conditions = [];
   const params = [];
 
   if (sourceName) {
-    query += ' WHERE source_name = ?';
+    conditions.push('source_name = ?');
     params.push(sourceName);
+  }
+
+  if (searchQuery) {
+    conditions.push('(title LIKE ? OR description LIKE ?)');
+    const likeValue = `%${searchQuery}%`;
+    params.push(likeValue, likeValue);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
   }
 
   query += ' ORDER BY published_at DESC LIMIT 50';
