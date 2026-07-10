@@ -9,6 +9,8 @@ const sessionStore = new MySQLStore({
   database: process.env.DB_NAME,
 });
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 module.exports = session({
   key: 'session_cookie',
   secret: process.env.SESSION_SECRET,
@@ -18,5 +20,7 @@ module.exports = session({
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // 1 day
     httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
   },
 });
