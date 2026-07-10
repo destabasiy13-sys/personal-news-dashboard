@@ -9,7 +9,11 @@ async function issueVerificationToken(userId, email) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
   await userModel.setVerificationToken(userId, token, expiresAt);
-  await sendVerificationEmail(email, token);
+  // Fire-and-forget: email delivery is a non-critical side effect and
+  // shouldn't block the request if the mail server is slow or unreachable.
+  sendVerificationEmail(email, token).catch((err) => {
+    console.error('Failed to send verification email:', err.message);
+  });
 }
 
 async function register(req, res) {

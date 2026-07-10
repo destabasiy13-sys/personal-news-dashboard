@@ -16,6 +16,12 @@ async function initMailer() {
       user: testAccount.user,
       pass: testAccount.pass,
     },
+    // Some hosts (e.g. Render's free tier) restrict outbound SMTP; without a
+    // timeout a blocked connection hangs the request indefinitely instead of
+    // failing fast.
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000,
   });
 
   console.log('Ethereal test inbox ready:', testAccount.user);
