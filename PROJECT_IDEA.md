@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Personal News Dashboard is a full-stack news aggregator: it pulls headlines from multiple outlets into a single searchable, filterable feed, and lets registered users save articles to read later. The system covers a complete data lifecycle — a background job that fetches and normalizes third-party data, a relational schema built around that data, session-based auth, and a public-facing analytics page — rather than being a purely CRUD-driven application.
+Personal News Dashboard is a full-stack news aggregator: it pulls headlines from multiple outlets into a single searchable, filterable feed, and lets registered users save articles to read later. The system covers a complete data lifecycle: a background job that fetches and normalizes third-party data, a relational schema built around that data, session-based auth, and a public-facing analytics page.
 
 ## Problem
 
